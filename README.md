@@ -28,6 +28,11 @@
   - It just works!
 - supabase-ssr. A package to configure Supabase Auth to use cookies
 - Password-based authentication block installed via the [Supabase UI Library](https://supabase.com/ui/docs/nextjs/password-based-auth)
+- **Stripe Integration** - Complete payment processing and subscription management
+  - Subscription plans with Stripe Checkout
+  - Customer portal for subscription management
+  - Webhook handling for real-time updates
+  - Product and pricing synchronization
 - Styling with [Tailwind CSS](https://tailwindcss.com)
 - Components with [shadcn/ui](https://ui.shadcn.com/)
 - Optional deployment with [Supabase Vercel Integration and Vercel deploy](#deploy-your-own)
@@ -73,14 +78,25 @@ If you wish to just develop locally and not deploy to Vercel, [follow the steps 
    cd with-supabase-app
    ```
 
-4. Rename `.env.example` to `.env.local` and update the following:
+4. Rename `.env.local.example` to `.env.local` and update the following:
 
    ```
+   # Supabase
    NEXT_PUBLIC_SUPABASE_URL=[INSERT SUPABASE PROJECT URL]
    NEXT_PUBLIC_SUPABASE_ANON_KEY=[INSERT SUPABASE PROJECT API ANON KEY]
+   
+   # Stripe
+   NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=[INSERT STRIPE PUBLISHABLE KEY]
+   STRIPE_SECRET_KEY=[INSERT STRIPE SECRET KEY]
+   STRIPE_WEBHOOK_SECRET=[INSERT STRIPE WEBHOOK SECRET]
+   
+   # Site URL
+   NEXT_PUBLIC_SITE_URL=http://localhost:3000
    ```
 
    Both `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY` can be found in [your Supabase project's API settings](https://supabase.com/dashboard/project/_?showConnect=true)
+   
+   Stripe keys can be found in your [Stripe Dashboard](https://dashboard.stripe.com/test/apikeys)
 
 5. You can now run the Next.js local development server:
 
@@ -93,6 +109,96 @@ If you wish to just develop locally and not deploy to Vercel, [follow the steps 
 6. This template comes with the default shadcn/ui style initialized. If you instead want other ui.shadcn styles, delete `components.json` and [re-install shadcn/ui](https://ui.shadcn.com/docs/installation/next)
 
 > Check out [the docs for Local Development](https://supabase.com/docs/guides/getting-started/local-development) to also run Supabase locally.
+
+## Stripe Payment Integration Setup
+
+This boilerplate includes a complete Stripe integration for payments and subscriptions.
+
+### Setting up Stripe
+
+1. **Create a Stripe Account**
+   - Go to [stripe.com](https://stripe.com) and create an account
+   - Switch to Test mode for development
+
+2. **Configure Customer Portal**
+   - Go to [Customer Portal Settings](https://dashboard.stripe.com/test/settings/billing/portal)
+   - Click the `Activate test link` button
+   - Configure the portal settings as needed
+
+3. **Run Database Migrations**
+   ```bash
+   # Run the migration to create Stripe-related tables
+   # You'll need the Supabase CLI installed
+   supabase migration up
+   ```
+
+4. **Set up Stripe Products**
+   
+   Option 1: Using Stripe Fixtures (Recommended)
+   ```bash
+   # Install Stripe CLI
+   brew install stripe/stripe-cli/stripe
+   
+   # Run the fixture to create sample products
+   stripe fixtures ./stripe-fixtures.json --api-key YOUR_STRIPE_SECRET_KEY
+   ```
+   
+   Option 2: Manual Setup
+   - Create products and prices in your [Stripe Dashboard](https://dashboard.stripe.com/test/products)
+   - Products will sync automatically via webhooks
+
+5. **Configure Stripe Webhook**
+   
+   For local development:
+   ```bash
+   # Forward webhooks to your local server
+   stripe listen --forward-to localhost:3000/api/webhooks
+   ```
+   
+   For production:
+   - Go to [Stripe Webhooks](https://dashboard.stripe.com/test/webhooks)
+   - Add endpoint: `https://your-domain.com/api/webhooks`
+   - Select events:
+     - `product.created`
+     - `product.updated`
+     - `price.created`
+     - `price.updated`
+     - `checkout.session.completed`
+     - `customer.subscription.created`
+     - `customer.subscription.updated`
+     - `customer.subscription.deleted`
+   - Copy the signing secret to `STRIPE_WEBHOOK_SECRET` env var
+
+### Available Pages
+
+- `/pricing` - Display all available pricing plans
+- `/account` - View current subscription and account details
+- `/manage-subscription` - Redirect to Stripe Customer Portal
+
+### Testing Payments
+
+Use these test card numbers:
+- **Success**: 4242 4242 4242 4242
+- **Decline**: 4000 0000 0000 0002
+- **Requires auth**: 4000 0025 0000 3155
+
+Fill any valid future date for expiry and any 3 digits for CVC.
+
+### Customizing Products
+
+Edit `stripe-fixtures.json` to customize your products and pricing. The metadata field supports:
+- `index`: Display order
+- `popular`: Mark as popular ("true")
+- `features`: Comma-separated list of features
+
+### Production Checklist
+
+- [ ] Activate your Stripe account
+- [ ] Switch from Test to Live mode in Stripe
+- [ ] Update all environment variables with production keys
+- [ ] Configure production webhook endpoint
+- [ ] Run fixtures with production API key
+- [ ] Test the complete payment flow
 
 ## Feedback and issues
 

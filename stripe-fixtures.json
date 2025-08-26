@@ -1,0 +1,116 @@
+{
+  "_meta": {
+    "template_version": 0
+  },
+  "fixtures": [
+    {
+      "name": "product_basic",
+      "path": "/v1/products",
+      "method": "post",
+      "params": {
+        "name": "Basic",
+        "description": "Perfect for individuals getting started",
+        "metadata": {
+          "index": "0",
+          "features": "Unlimited projects, Basic analytics, Email support, 1 team member"
+        }
+      }
+    },
+    {
+      "name": "price_basic_monthly",
+      "path": "/v1/prices",
+      "method": "post",
+      "params": {
+        "product": "${product_basic:id}",
+        "currency": "usd",
+        "unit_amount": 900,
+        "recurring": {
+          "interval": "month",
+          "trial_period_days": 7
+        }
+      }
+    },
+    {
+      "name": "price_basic_yearly",
+      "path": "/v1/prices",
+      "method": "post",
+      "params": {
+        "product": "${product_basic:id}",
+        "currency": "usd",
+        "unit_amount": 9000,
+        "recurring": {
+          "interval": "year",
+          "trial_period_days": 7
+        }
+      }
+    },
+    {
+      "name": "product_pro",
+      "path": "/v1/products",
+      "method": "post",
+      "params": {
+        "name": "Pro",
+        "description": "Best for growing teams and businesses",
+        "metadata": {
+          "index": "1",
+          "popular": "true",
+          "features": "Everything in Basic, Advanced analytics, Priority support, 10 team members, API access, Custom integrations"
+        }
+      }
+    },
+    {
+      "name": "price_pro_monthly",
+      "path": "/v1/prices",
+      "method": "post",
+      "params": {
+        "product": "${product_pro:id}",
+        "currency": "usd",
+        "unit_amount": 2900,
+        "recurring": {
+          "interval": "month",
+          "trial_period_days": 14
+        }
+      }
+    },
+    {
+      "name": "price_pro_yearly",
+      "path": "/v1/prices",
+      "method": "post",
+      "params": {
+        "product": "${product_pro:id}",
+        "currency": "usd",
+        "unit_amount": 29000,
+        "recurring": {
+          "interval": "year",
+          "trial_period_days": 14
+        }
+      }
+    },
+    {
+      "name": "product_enterprise",
+      "path": "/v1/products",
+      "method": "post",
+      "params": {
+        "name": "Enterprise",
+        "description": "For large organizations with custom needs",
+        "metadata": {
+          "index": "2",
+          "features": "Everything in Pro, Unlimited team members, Dedicated support, Custom contracts, SLA guarantee, On-premise deployment, Advanced security features"
+        }
+      }
+    },
+    {
+      "name": "price_enterprise_monthly",
+      "path": "/v1/prices",
+      "method": "post",
+      "params": {
+        "product": "${product_enterprise:id}",
+        "currency": "usd",
+        "unit_amount": 9900,
+        "recurring": {
+          "interval": "month"
+        }
+      }
+    }
+  ]
+}
