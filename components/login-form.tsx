@@ -186,14 +186,14 @@ export function LoginForm({
                 </form>
               ) : (
                 <div className="flex flex-col gap-4 text-center">
-                  <div className="rounded-md bg-green-50 dark:bg-green-950/20 p-4">
-                    <h3 className="font-medium text-green-900 dark:text-green-400">
+                  <div className="rounded-md bg-green-500/10 dark:bg-green-500/20 p-4 border border-green-500/20">
+                    <h3 className="font-medium text-green-600 dark:text-green-400">
                       Check your email!
                     </h3>
-                    <p className="mt-2 text-sm text-green-800 dark:text-green-500">
+                    <p className="mt-2 text-sm text-green-600/90 dark:text-green-400/90">
                       We've sent a magic link to <strong>{email}</strong>
                     </p>
-                    <p className="mt-1 text-xs text-green-700 dark:text-green-600">
+                    <p className="mt-1 text-xs text-green-600/70 dark:text-green-400/70">
                       Click the link in your email to sign in
                     </p>
                   </div>

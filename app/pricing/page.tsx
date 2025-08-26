@@ -1,6 +1,7 @@
 import { getProducts } from '@/lib/stripe/controllers/get-products';
 import { PriceCard } from '@/components/pricing/price-card';
 import { createCheckoutAction } from '@/lib/stripe/actions/create-checkout';
+import { ThemeSwitcher } from '@/components/theme-switcher';
 
 export default async function PricingPage() {
   const products = await getProducts();
@@ -19,6 +20,9 @@ export default async function PricingPage() {
 
   return (
     <div className="flex-1 w-full flex flex-col gap-12 p-8">
+      <div className="absolute top-4 right-4">
+        <ThemeSwitcher />
+      </div>
       <div className="text-center space-y-4">
         <h1 className="text-4xl font-bold">
           Choose Your Plan
@@ -29,7 +33,7 @@ export default async function PricingPage() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto w-full">
-        {priceCards.map((card, index) => (
+        {priceCards.map((card) => (
           <PriceCard 
             key={`${card.id}-${card.selectedPrice.id}`} 
             product={card} 
