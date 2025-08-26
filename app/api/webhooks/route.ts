@@ -16,9 +16,14 @@ const relevantEvents = new Set([
 ]);
 
 export async function POST(req: Request) {
+  console.log('Webhook received');
+  
   const body = await req.text();
   const sig = req.headers.get('stripe-signature') as string;
   const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
+  
+  console.log('Webhook secret exists:', !!webhookSecret);
+  console.log('Signature exists:', !!sig);
   
   if (!webhookSecret) {
     console.error('STRIPE_WEBHOOK_SECRET is not set');
@@ -29,11 +34,14 @@ export async function POST(req: Request) {
 
   try {
     if (!sig) {
+      console.error('No signature in request headers');
       return Response.json('No signature provided', { status: 400 });
     }
     event = stripeAdmin.webhooks.constructEvent(body, sig, webhookSecret);
+    console.log('Webhook event constructed successfully:', event.type);
   } catch (error) {
     console.error('Webhook signature verification failed:', error);
+    console.error('Make sure your STRIPE_WEBHOOK_SECRET matches the one from stripe listen command');
     return Response.json(`Webhook Error: ${(error as any).message}`, { status: 400 });
   }
 
@@ -42,11 +50,15 @@ export async function POST(req: Request) {
       switch (event.type) {
         case 'product.created':
         case 'product.updated':
+          console.log('Processing product:', (event.data.object as Stripe.Product).name);
           await upsertProduct(event.data.object as Stripe.Product);
+          console.log('Product processed successfully');
           break;
         case 'price.created':
         case 'price.updated':
+          console.log('Processing price:', (event.data.object as Stripe.Price).id);
           await upsertPrice(event.data.object as Stripe.Price);
+          console.log('Price processed successfully');
           break;
         case 'customer.subscription.created':
         case 'customer.subscription.updated':

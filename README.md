@@ -175,6 +175,64 @@ This boilerplate includes a complete Stripe integration for payments and subscri
 - `/account` - View current subscription and account details
 - `/manage-subscription` - Redirect to Stripe Customer Portal
 
+### How Products Flow from Stripe to Your App
+
+This integration uses a two-way sync between Stripe and your database:
+
+1. **Creating Products in Stripe**
+   - Products are created in Stripe (via fixtures or dashboard)
+   - Stripe sends webhook events to your app
+   - Your webhook handler saves products to Supabase database
+   - Products are now queryable from your database
+
+2. **Product Display Flow**
+   ```
+   Stripe Dashboard → Webhook → Your Database → /pricing page
+   ```
+   - The `/pricing` page queries YOUR database (not Stripe directly)
+   - This makes page loads fast and reduces Stripe API calls
+   - Products stay in sync via webhooks
+
+3. **Checkout Flow**
+   ```
+   User clicks "Get Started" → Create Stripe session → Redirect to Stripe → Payment → Webhook updates subscription
+   ```
+
+### Quick Start Guide
+
+To get products showing on your `/pricing` page:
+
+1. **Ensure your `.env.local` has all required keys**
+   ```bash
+   NEXT_PUBLIC_SUPABASE_URL=your_url_here
+   NEXT_PUBLIC_SUPABASE_ANON_KEY=your_key_here
+   STRIPE_SECRET_KEY=sk_test_your_key_here
+   STRIPE_WEBHOOK_SECRET=whsec_your_secret_here
+   ```
+
+2. **Run the database migration**
+   ```bash
+   # This creates the products, prices, customers, and subscriptions tables
+   # Run this SQL in your Supabase SQL editor:
+   # Copy contents from supabase/migrations/20240826_stripe_tables.sql
+   ```
+
+3. **Start webhook listener (keep this running)**
+   ```bash
+   stripe listen --forward-to localhost:3000/api/webhooks
+   ```
+   Copy the webhook signing secret it gives you to `STRIPE_WEBHOOK_SECRET`
+
+4. **Load products into Stripe**
+   ```bash
+   stripe fixtures ./stripe-fixtures.json --api-key sk_test_YOUR_KEY
+   ```
+
+5. **Verify products are synced**
+   - Check Stripe Dashboard → Products (should see 3 products)
+   - Check Supabase → Table Editor → products table (should see same products)
+   - Visit `/pricing` - products should now appear!
+
 ### Testing Payments
 
 Use these test card numbers:

@@ -1,5 +1,5 @@
 import { stripeAdmin } from '@/lib/stripe/stripe-admin';
-import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 
 type Props = {
   subscriptionId: string;
@@ -8,7 +8,7 @@ type Props = {
 };
 
 export async function upsertUserSubscription({ subscriptionId, customerId, isCreateAction }: Props) {
-  const supabase = await createClient();
+  const supabase = createAdminClient();
   
   // Get customer's UUID from mapping table
   const { data: customerData, error: customerError } = await supabase

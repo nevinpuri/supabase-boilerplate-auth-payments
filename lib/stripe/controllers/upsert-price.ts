@@ -1,8 +1,8 @@
 import Stripe from 'stripe';
-import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 
 export async function upsertPrice(price: Stripe.Price) {
-  const supabase = await createClient();
+  const supabase = createAdminClient();
   
   const priceData = {
     id: price.id,

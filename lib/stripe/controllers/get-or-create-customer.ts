@@ -1,5 +1,5 @@
 import { stripeAdmin } from '@/lib/stripe/stripe-admin';
-import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 
 type Props = {
   userId: string;
@@ -7,7 +7,7 @@ type Props = {
 };
 
 export async function getOrCreateCustomer({ userId, email }: Props) {
-  const supabase = await createClient();
+  const supabase = createAdminClient();
   
   // Check if customer exists
   const { data: existingCustomer } = await supabase

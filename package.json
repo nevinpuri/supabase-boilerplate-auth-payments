@@ -4,6 +4,7 @@
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
+    "sync": "node scripts/sync-stripe-products.js",
     "lint": "next lint"
   },
   "dependencies": {
