@@ -5,6 +5,7 @@
     "build": "next build",
     "start": "next start",
     "sync": "node scripts/sync-stripe-products.js",
+    "fix-customer-mapping": "node scripts/fix-customer-mapping.js",
     "lint": "next lint"
   },
   "dependencies": {

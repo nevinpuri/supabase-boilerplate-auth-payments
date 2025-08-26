@@ -72,6 +72,31 @@ export async function POST(req: Request) {
           break;
         case 'checkout.session.completed':
           const checkoutSession = event.data.object as Stripe.Checkout.Session;
+          console.log('Checkout session completed:', checkoutSession.id);
+          console.log('Customer:', checkoutSession.customer);
+          console.log('Customer details:', checkoutSession.customer_details);
+          
+          // First, ensure the customer mapping exists
+          if (checkoutSession.customer && checkoutSession.customer_details?.email) {
+            const supabase = (await import('@/lib/supabase/admin')).createAdminClient();
+            
+            // Get user by email
+            const { data: userData } = await supabase
+              .from('users')
+              .select('id')
+              .eq('email', checkoutSession.customer_details.email)
+              .maybeSingle();
+            
+            if (userData) {
+              console.log('Creating customer mapping for user:', userData.id);
+              await supabase
+                .from('customers')
+                .upsert([{ 
+                  id: userData.id, 
+                  stripe_customer_id: checkoutSession.customer as string 
+                }]);
+            }
+          }
           
           if (checkoutSession.mode === 'subscription') {
             const subscriptionId = checkoutSession.subscription;
