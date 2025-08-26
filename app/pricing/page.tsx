@@ -8,6 +8,15 @@ export default async function PricingPage() {
   console.log('Products fetched:', products.length, 'products');
   console.log('Products data:', JSON.stringify(products, null, 2));
 
+  // Flatten products with multiple prices into separate cards
+  const priceCards = products.flatMap(product => 
+    product.prices.map(price => ({
+      ...product,
+      prices: [price],
+      selectedPrice: price
+    }))
+  );
+
   return (
     <div className="flex-1 w-full flex flex-col gap-12 p-8">
       <div className="text-center space-y-4">
@@ -20,10 +29,11 @@ export default async function PricingPage() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto w-full">
-        {products.map((product) => (
+        {priceCards.map((card, index) => (
           <PriceCard 
-            key={product.id} 
-            product={product} 
+            key={`${card.id}-${card.selectedPrice.id}`} 
+            product={card} 
+            price={card.selectedPrice}
             createCheckoutAction={createCheckoutAction}
           />
         ))}

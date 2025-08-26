@@ -18,13 +18,30 @@ export function PriceCard({ product, price, createCheckoutAction }: PriceCardPro
     return null;
   }
 
-  const features = product.metadata?.features 
-    ? (typeof product.metadata.features === 'string' 
-        ? product.metadata.features.split(',') 
-        : product.metadata.features)
-    : [];
+  // Determine tier name based on price
+  const getTierName = (amount: number) => {
+    if (amount === 4900) return 'Starter';
+    if (amount === 14900) return 'Professional';
+    if (amount === 39900) return 'Enterprise';
+    return product.name;
+  };
 
-  const isPopular = product.metadata?.popular === 'true';
+  const getTierDescription = (amount: number) => {
+    if (amount === 4900) return 'Perfect for individuals getting started';
+    if (amount === 14900) return 'Best for growing teams';
+    if (amount === 39900) return 'For large organizations';
+    return product.description;
+  };
+
+  const getTierFeatures = (amount: number) => {
+    if (amount === 4900) return ['Up to 100 leads/month', 'Basic scoring', 'Email support', '1 user'];
+    if (amount === 14900) return ['Up to 1,000 leads/month', 'Advanced scoring', 'Priority support', '5 users', 'API access'];
+    if (amount === 39900) return ['Unlimited leads', 'Custom scoring models', 'Dedicated support', 'Unlimited users', 'Custom integrations'];
+    return [];
+  };
+
+  const features = getTierFeatures(selectedPrice.unit_amount || 0);
+  const isPopular = selectedPrice.unit_amount === 14900; // Make Professional tier popular
 
   return (
     <Card className={`relative ${isPopular ? 'border-primary shadow-lg' : ''}`}>
@@ -36,8 +53,8 @@ export function PriceCard({ product, price, createCheckoutAction }: PriceCardPro
         </div>
       )}
       <CardHeader>
-        <CardTitle>{product.name}</CardTitle>
-        <CardDescription>{product.description}</CardDescription>
+        <CardTitle>{getTierName(selectedPrice.unit_amount || 0)}</CardTitle>
+        <CardDescription>{getTierDescription(selectedPrice.unit_amount || 0)}</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="flex items-baseline gap-1">
