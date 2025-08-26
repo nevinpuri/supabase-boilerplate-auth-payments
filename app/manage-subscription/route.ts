@@ -18,18 +18,13 @@ export async function GET() {
 
   if (!customerId) {
     console.error('No Stripe customer found for user:', user.id);
-    return redirect('/account');
+    return redirect('/account?error=no-customer');
   }
 
-  try {
-    const { url } = await stripeAdmin.billingPortal.sessions.create({
-      customer: customerId,
-      return_url: `${getURL()}account`,
-    });
+  const { url } = await stripeAdmin.billingPortal.sessions.create({
+    customer: customerId,
+    return_url: `${getURL()}account`,
+  });
 
-    redirect(url);
-  } catch (error) {
-    console.error('Error creating portal session:', error);
-    return redirect('/account?error=portal');
-  }
+  return redirect(url);
 }
